@@ -11,31 +11,48 @@
     // Your Databowl credentials
     var urlId = "9b01a6a7-d2c9-4c17-9f11-c147f3d1661e";
     var affiliateId = "efe89f9b-e7bc-4f40-92d1-0fbb47062f03";
+    var subAffiliateId = null; // optional
 
     // Initialize tracking
-    var trackingOptions = new DbEvtTracking.OptionsObject(
-      urlId,
-      affiliateId
-    );
-    var trackingClient = new DbEvtTracking.TrackingClient(
-      trackingOptions
-    );
+    var trackingOptions = new DbEvtTracking.OptionsObject(urlId, affiliateId);
+    var trackingClient = new DbEvtTracking.TrackingClient(trackingOptions);
 
     // Extract URL parameters
     var urlParams = new URLSearchParams(window.location.search);
 
-    // Track page view with all URL params
-    trackingClient.registerPageView({
-      utm_source: urlParams.get('utm_source'),
-      utm_medium: urlParams.get('utm_medium'),
-      utm_campaign: urlParams.get('utm_campaign'),
-      utm_content: urlParams.get('utm_content'),
-      utm_term: urlParams.get('utm_term'),
-      click_id: urlParams.get('clickid'),
-      gclid: urlParams.get('gclid'), // Google Ads
-      fbclid: urlParams.get('fbclid'), // Facebook
-      msclkid: urlParams.get('msclkid') // Microsoft Ads
-    });
+    function buildPageViewPayload(uid) {
+      return {
+        uid: uid, // keep if your backend accepts/uses explicit uid in payload
+        utm_source: urlParams.get("utm_source"),
+        utm_medium: urlParams.get("utm_medium"),
+        utm_campaign: urlParams.get("utm_campaign"),
+        utm_content: urlParams.get("utm_content"),
+        utm_term: urlParams.get("utm_term"),
+        click_id: urlParams.get("clickid"),
+        gclid: urlParams.get("gclid"),
+        fbclid: urlParams.get("fbclid"),
+        msclkid: urlParams.get("msclkid")
+      };
+    }
+
+    (async function initTracking() {
+      try {
+        // Works whether getUid returns sync value or Promise
+        var uid = await Promise.resolve(
+          trackingClient.getUid(affiliateId, subAffiliateId)
+        );
+
+        // Optional: persist for subsequent events
+        if (uid) trackingClient.setEventParam("uid", uid);
+
+        // Send page view only after UID resolution
+        trackingClient.registerPageView(buildPageViewPayload(uid));
+      } catch (err) {
+        // Fallback: still track page view even if UID lookup fails
+        console.error("getUid failed, sending page view without uid", err);
+        trackingClient.registerPageView(buildPageViewPayload(null));
+      }
+    })();
   </script>
 </body>
 </html>

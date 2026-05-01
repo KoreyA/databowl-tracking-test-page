@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Databowl Affiliate Tracking - Comprehensive Use Cases</title>
+  <script src="https://cdn.databowlpages.com/js/dbevt-tracking.1.0.25.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f7f8fa;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e7e8ec;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    input, textarea, select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #d4d7de;
+      border-radius: 8px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #0a66d1;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    button.secondary {
+      background: #4b5563;
+    }
+    .muted {
+      color: #5f6773;
+      font-size: 14px;
+    }
+    .code {
+      background: #101828;
+      color: #e7ecf5;
+      font-family: Consolas, monospace;
+      border-radius: 8px;
+      padding: 10px;
+      overflow: auto;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    .pill {
+      display: inline-block;
+      border: 1px solid #c8d2e5;
+      background: #eef4ff;
+      color: #234;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    #logArea {
+      min-height: 210px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Databowl Affiliate Tracking - Comprehensive Use Cases</h1>
+    <p class="muted">
+      This standalone page demonstrates practical usage patterns for the Databowl Affiliate Tracking library:
+      page views, click attribution data, conversion events, lead form enrichment, event parameter storage, UID lookup,
+      and optional bot-check integrations.
+    </p>
+
+    <div class="card">
+      <h2>1) Setup & Initialization</h2>
+      <p class="muted">
+        Replace placeholders with your Databowl integration values. This initializes one reusable tracking client.
+      </p>
+      <div class="row">
+        <div>
+          <label for="urlIdInput">URL ID</label>
+          <input id="urlIdInput" value="9b01a6a7-d2c9-4c17-9f11-c147f3d1661e">
+        </div>
+        <div>
+          <label for="affiliateIdInput">Default Affiliate ID</label>
+          <input id="affiliateIdInput" value="efe89f9b-e7bc-4f40-92d1-0fbb47062f03">
+        </div>
+        <div>
+          <label for="cookieDaysInput">Cookie Expiry (days)</label>
+          <input id="cookieDaysInput" type="number" value="7">
+        </div>
+      </div>
+      <button id="initBtn">Initialize Tracking Client</button>
+      <span id="initStatus" class="muted">Not initialized</span>
+      <div class="code" id="setupSnippet"></div>
+    </div>
+
+    <div class="card">
+      <h2>2) Use Case: Landing Page Tracking (UTMs + Ad Click IDs)</h2>
+      <p class="muted">
+        Captures page view plus marketing parameters from the query string (UTM tags, gclid, fbclid, etc.).
+      </p>
+      <div>
+        <span class="pill">registerPageView</span>
+        <span class="pill">URLSearchParams</span>
+        <span class="pill">Marketing attribution</span>
+      </div>
+      <button id="trackLandingBtn">Track Landing Page View</button>
+    </div>
+
+    <div class="card">
+      <h2>3) Use Case: Product Signup / Lead Form</h2>
+      <p class="muted">Store lead metadata in event params, then create a lead event type.</p>
+      <div class="row">
+        <div>
+          <label for="emailInput">Email</label>
+          <input id="emailInput" type="email" value="customer@example.com">
+        </div>
+        <div>
+          <label for="countryInput">Country</label>
+          <input id="countryInput" value="GB">
+        </div>
+        <div>
+          <label for="leadSourceInput">Lead Source</label>
+          <input id="leadSourceInput" value="pricing-page">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="leadEventTypeInput">Lead Event Type ID</label>
+          <input id="leadEventTypeInput" type="number" value="2">
+        </div>
+      </div>
+      <button id="setLeadParamsBtn">Set Lead Event Params</button>
+      <button id="submitLeadEventBtn">Create Lead Event</button>
+    </div>
+
+    <div class="card">
+      <h2>4) Use Case: Checkout Conversion Event</h2>
+      <p class="muted">Send order-level details with a conversion event when a purchase is completed.</p>
+      <div class="row">
+        <div>
+          <label for="orderIdInput">Order ID</label>
+          <input id="orderIdInput" value="ORD-100234">
+        </div>
+        <div>
+          <label for="orderValueInput">Order Value</label>
+          <input id="orderValueInput" type="number" value="249.99" step="0.01">
+        </div>
+        <div>
+          <label for="currencyInput">Currency</label>
+          <input id="currencyInput" value="USD">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="conversionEventTypeInput">Conversion Event Type ID</label>
+          <input id="conversionEventTypeInput" type="number" value="5">
+        </div>
+      </div>
+      <button id="trackConversionBtn">Create Conversion Event</button>
+    </div>
+
+    <div class="card">
+      <h2>5) Use Case: Read & Manage Stored Event Parameters</h2>
+      <p class="muted">Useful for multi-step funnels where you persist attribution/session details between actions.</p>
+      <button id="getAllParamsBtn" class="secondary">Get All Event Params</button>
+      <button id="getSingleParamBtn" class="secondary">Get "utm_source"</button>
+      <button id="setSingleParamBtn" class="secondary">Set "funnel_step" = "payment"</button>
+    </div>
+
+    <div class="card">
+      <h2>6) Use Case: Resolve User UID for an Affiliate</h2>
+      <p class="muted">Retrieve a Databowl user ID from affiliate/sub-affiliate IDs for identity continuity.</p>
+      <div class="row">
+        <div>
+          <label for="uidAffiliateIdInput">Affiliate ID</label>
+          <input id="uidAffiliateIdInput" value="efe89f9b-e7bc-4f40-92d1-0fbb47062f03">
+        </div>
+        <div>
+          <label for="subAffiliateIdInput">Sub-Affiliate ID (optional)</label>
+          <input id="subAffiliateIdInput" value="">
+        </div>
+      </div>
+      <button id="getUidBtn">Get UID</button>
+    </div>
+
+    <div class="card">
+      <h2>7) Optional: Bot Mitigation Hook (Recaptcha Flow)</h2>
+      <p class="muted">
+        If configured with Recaptcha keys in your Databowl options, you can run an active Recaptcha check.
+      </p>
+      <button id="runRecaptchaBtn" class="secondary">Run Active Recaptcha Check</button>
+      <div id="recaptchaContainer"></div>
+    </div>
+
+    <div class="card">
+      <h2>Execution Log</h2>
+      <textarea id="logArea" readonly></textarea>
+    </div>
+  </div>
+
+  <script>
+    var trackingClient = null;
+
+    function log(message, data) {
+      var area = document.getElementById("logArea");
+      var line = "[" + new Date().toISOString() + "] " + message;
+      if (typeof data !== "undefined") {
+        try {
+          line += " | " + JSON.stringify(data);
+        } catch (err) {
+          line += " | " + String(data);
+        }
+      }
+      area.value = line + "\n" + area.value;
+    }
+
+    function ensureClient() {
+      if (!trackingClient) {
+        throw new Error("Tracking client not initialized. Click 'Initialize Tracking Client' first.");
+      }
+    }
+
+    function buildClient() {
+      var urlId = document.getElementById("urlIdInput").value.trim();
+      var defaultAffiliateId = document.getElementById("affiliateIdInput").value.trim();
+      var cookieDays = parseInt(document.getElementById("cookieDaysInput").value, 10) || 7;
+
+      var options = new DbEvtTracking.OptionsObject(urlId, defaultAffiliateId);
+      options.cookieExpiryInDays = cookieDays;
+
+      trackingClient = new DbEvtTracking.TrackingClient(options);
+      trackingClient.registerUserIpReceivedCallback(function (ipAddress) {
+        log("User IP callback fired", { ipAddress: ipAddress });
+      });
+
+      document.getElementById("initStatus").textContent = "Initialized";
+      document.getElementById("setupSnippet").textContent =
+        "var options = new DbEvtTracking.OptionsObject('" + urlId + "', '" + defaultAffiliateId + "');\n" +
+        "options.cookieExpiryInDays = " + cookieDays + ";\n" +
+        "var trackingClient = new DbEvtTracking.TrackingClient(options);";
+
+      log("Tracking client initialized", { urlId: urlId, defaultAffiliateId: defaultAffiliateId, cookieDays: cookieDays });
+    }
+
+    function trackLandingPage() {
+      ensureClient();
+      var params = new URLSearchParams(window.location.search);
+      var payload = {
+        utm_source: params.get("utm_source"),
+        utm_medium: params.get("utm_medium"),
+        utm_campaign: params.get("utm_campaign"),
+        utm_content: params.get("utm_content"),
+        utm_term: params.get("utm_term"),
+        click_id: params.get("clickid"),
+        gclid: params.get("gclid"),
+        fbclid: params.get("fbclid"),
+        msclkid: params.get("msclkid")
+      };
+      var res = trackingClient.registerPageView(payload);
+      log("Landing page tracked via registerPageView", { payload: payload, response: res });
+    }
+
+    function setLeadParams() {
+      ensureClient();
+      var email = document.getElementById("emailInput").value.trim();
+      var country = document.getElementById("countryInput").value.trim();
+      var leadSource = document.getElementById("leadSourceInput").value.trim();
+      var payload = {
+        lead_email: email,
+        lead_country: country,
+        lead_source: leadSource,
+        captured_at: new Date().toISOString()
+      };
+      trackingClient.addEventParams(payload);
+      log("Lead parameters stored via addEventParams", payload);
+    }
+
+    function createLeadEvent() {
+      ensureClient();
+      var eventType = parseInt(document.getElementById("leadEventTypeInput").value, 10);
+      var payload = {
+        stage: "lead-submitted",
+        source_page: "demo-use-cases"
+      };
+      var res = trackingClient.createEvent(eventType, payload);
+      log("Lead event sent via createEvent", { eventTypeId: eventType, payload: payload, response: res });
+    }
+
+    function createConversionEvent() {
+      ensureClient();
+      var eventType = parseInt(document.getElementById("conversionEventTypeInput").value, 10);
+      var orderId = document.getElementById("orderIdInput").value.trim();
+      var orderValue = parseFloat(document.getElementById("orderValueInput").value);
+      var currency = document.getElementById("currencyInput").value.trim();
+      var payload = {
+        order_id: orderId,
+        order_value: orderValue,
+        currency: currency,
+        converted_at: new Date().toISOString()
+      };
+      var res = trackingClient.createEvent(eventType, payload);
+      log("Conversion event sent via createEvent", { eventTypeId: eventType, payload: payload, response: res });
+    }
+
+    function getAllEventParams() {
+      ensureClient();
+      var params = trackingClient.getEventParams();
+      log("Current event params fetched via getEventParams", params);
+    }
+
+    function getSingleEventParam() {
+      ensureClient();
+      var value = trackingClient.getEventParam("utm_source", "unknown");
+      log("Single event param fetched via getEventParam", { key: "utm_source", value: value });
+    }
+
+    function setSingleEventParam() {
+      ensureClient();
+      trackingClient.setEventParam("funnel_step", "payment");
+      log("Single event param set via setEventParam", { key: "funnel_step", value: "payment" });
+    }
+
+    function resolveUid() {
+      ensureClient();
+      var affiliateId = document.getElementById("uidAffiliateIdInput").value.trim();
+      var subAffiliateIdRaw = document.getElementById("subAffiliateIdInput").value.trim();
+      var subAffiliateId = subAffiliateIdRaw ? subAffiliateIdRaw : null;
+      var uid = trackingClient.getUid(affiliateId, subAffiliateId);
+      log("UID resolved via getUid", { affiliateId: affiliateId, subAffiliateId: subAffiliateId, uid: uid });
+    }
+
+    function runRecaptcha() {
+      ensureClient();
+      var container = document.getElementById("recaptchaContainer");
+      container.innerHTML = "";
+      var element = document.createElement("div");
+      container.appendChild(element);
+      trackingClient.activeRecaptchaCheck("demo_use_case_check", element);
+      log("activeRecaptchaCheck invoked", { action: "demo_use_case_check" });
+    }
+
+    function safeAction(fn) {
+      return function () {
+        try {
+          fn();
+        } catch (err) {
+          log("Action failed", { error: err.message || String(err) });
+        }
+      };
+    }
+
+    document.getElementById("initBtn").addEventListener("click", safeAction(buildClient));
+    document.getElementById("trackLandingBtn").addEventListener("click", safeAction(trackLandingPage));
+    document.getElementById("setLeadParamsBtn").addEventListener("click", safeAction(setLeadParams));
+    document.getElementById("submitLeadEventBtn").addEventListener("click", safeAction(createLeadEvent));
+    document.getElementById("trackConversionBtn").addEventListener("click", safeAction(createConversionEvent));
+    document.getElementById("getAllParamsBtn").addEventListener("click", safeAction(getAllEventParams));
+    document.getElementById("getSingleParamBtn").addEventListener("click", safeAction(getSingleEventParam));
+    document.getElementById("setSingleParamBtn").addEventListener("click", safeAction(setSingleEventParam));
+    document.getElementById("getUidBtn").addEventListener("click", safeAction(resolveUid));
+    document.getElementById("runRecaptchaBtn").addEventListener("click", safeAction(runRecaptcha));
+
+    log("Page ready. Initialize tracking client to start testing use cases.");
+  </script>
+</body>
+</html>
