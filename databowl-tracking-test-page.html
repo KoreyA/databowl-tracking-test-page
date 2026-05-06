@@ -1,58 +1,84 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Landing Page</title>
   <script src="https://cdn.databowlpages.com/js/dbevt-tracking.1.0.25.js"></script>
 </head>
+
 <body>
   <h1>Welcome!</h1>
+
+  <!-- Lead Capture Form -->
+  <form id="lead-form">
+    <input type="text" name="name" placeholder="Name" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="tel" name="phone" placeholder="Phone">
+    <button type="submit">Submit</button>
+  </form>
 
   <script>
     // Your Databowl credentials
     var urlId = "9b01a6a7-d2c9-4c17-9f11-c147f3d1661e";
     var affiliateId = "efe89f9b-e7bc-4f40-92d1-0fbb47062f03";
-    var subAffiliateId = null; // optional
+    var subAffiliateId =
+      urlParams.get('subid') ||
+      urlParams.get('sub_id') ||
+      urlParams.get('aff_sub') ||
+      urlParams.get('db_subaffid') ||
+      null;
 
     // Initialize tracking
-    var trackingOptions = new DbEvtTracking.OptionsObject(urlId, affiliateId);
-    var trackingClient = new DbEvtTracking.TrackingClient(trackingOptions);
+    var trackingOptions = new DbEvtTracking.OptionsObject(
+      urlId,
+      affiliateId,
+      subAffiliateId
+    );
+    var trackingClient = new DbEvtTracking.TrackingClient(
+      trackingOptions
+    );
 
     // Extract URL parameters
     var urlParams = new URLSearchParams(window.location.search);
 
-    function buildPageViewPayload(uid) {
-      return {
-        uid: uid, // keep if your backend accepts/uses explicit uid in payload
-        utm_source: urlParams.get("utm_source"),
-        utm_medium: urlParams.get("utm_medium"),
-        utm_campaign: urlParams.get("utm_campaign"),
-        utm_content: urlParams.get("utm_content"),
-        utm_term: urlParams.get("utm_term"),
-        click_id: urlParams.get("clickid"),
-        gclid: urlParams.get("gclid"),
-        fbclid: urlParams.get("fbclid"),
-        msclkid: urlParams.get("msclkid")
-      };
+    function pickDefined(obj) {
+      return Object.fromEntries(
+        Object.entries(obj).filter(function (entry) {
+          var value = entry[1];
+          return value !== null && value !== undefined && value !== '';
+        })
+      );
     }
 
-    (async function initTracking() {
-      try {
-        // Works whether getUid returns sync value or Promise
-        var uid = await Promise.resolve(
-          trackingClient.getUid(affiliateId, subAffiliateId)
-        );
+    var trackingParams = pickDefined({
+      utm_source: urlParams.get('utm_source'),
+      utm_medium: urlParams.get('utm_medium'),
+      utm_campaign: urlParams.get('utm_campaign'),
+      utm_content: urlParams.get('utm_content'),
+      utm_term: urlParams.get('utm_term'),
+      click_id: urlParams.get('clickid'),
+      gclid: urlParams.get('gclid'), // Google Ads
+      fbclid: urlParams.get('fbclid'), // Facebook
+      msclkid: urlParams.get('msclkid') // Microsoft Ads
+    });
 
-        // Optional: persist for subsequent events
-        if (uid) trackingClient.setEventParam("uid", uid);
+    // Track page view with filtered URL params
+    trackingClient.registerPageView(trackingParams);
 
-        // Send page view only after UID resolution
-        trackingClient.registerPageView(buildPageViewPayload(uid));
-      } catch (err) {
-        // Fallback: still track page view even if UID lookup fails
-        console.error("getUid failed, sending page view without uid", err);
-        trackingClient.registerPageView(buildPageViewPayload(null));
-      }
-    })();
+    // Track form submission as conversion
+    document.getElementById('lead-form')
+      .addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Fire conversion event (Event Type ID: 2)
+        var conversionParams = pickDefined(Object.assign({}, trackingParams, {
+          form_id: 'lead-form',
+          event_name: 'form_submitted'
+        }));
+
+        trackingClient.createEvent(2, conversionParams);
+      });
   </script>
 </body>
+
 </html>
