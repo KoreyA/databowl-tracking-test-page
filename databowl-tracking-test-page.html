@@ -18,6 +18,9 @@
   </form>
 
   <script>
+    // Extract URL parameters
+    var urlParams = new URLSearchParams(window.location.search);
+
     // Your Databowl credentials
     var urlId = "9b01a6a7-d2c9-4c17-9f11-c147f3d1661e";
     var affiliateId = "efe89f9b-e7bc-4f40-92d1-0fbb47062f03";
@@ -31,15 +34,11 @@
     // Initialize tracking
     var trackingOptions = new DbEvtTracking.OptionsObject(
       urlId,
-      affiliateId,
-      subAffiliateId
+      affiliateId
     );
     var trackingClient = new DbEvtTracking.TrackingClient(
       trackingOptions
     );
-
-    // Extract URL parameters
-    var urlParams = new URLSearchParams(window.location.search);
 
     function pickDefined(obj) {
       return Object.fromEntries(
