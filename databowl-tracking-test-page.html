@@ -10,7 +10,7 @@
   <h1>Welcome!</h1>
 
   <!-- Lead Capture Form -->
-  <form id="lead-form">
+  <form id="lead-form" method="POST">
     <input type="text" name="name" placeholder="Name" required>
     <input type="email" name="email" placeholder="Email" required>
     <input type="tel" name="phone" placeholder="Phone">
@@ -39,6 +39,18 @@
     var trackingClient = new DbEvtTracking.TrackingClient(
       trackingOptions
     );
+    var DEBUG_EVENT_PAYLOAD = true; // Temporary local verification flag
+
+    if (DEBUG_EVENT_PAYLOAD && typeof trackingClient.createEvent === 'function') {
+      var originalCreateEvent = trackingClient.createEvent.bind(trackingClient);
+      trackingClient.createEvent = function (eventTypeId, eventParams) {
+        console.group('DEBUG Databowl createEvent payload');
+        console.log('eventTypeId:', eventTypeId);
+        console.log('eventParams:', JSON.parse(JSON.stringify(eventParams || {})));
+        console.groupEnd();
+        return originalCreateEvent(eventTypeId, eventParams);
+      };
+    }
 
     function pickDefined(obj) {
       return Object.fromEntries(
@@ -68,20 +80,20 @@
     document.getElementById('lead-form')
       .addEventListener('submit', function (e) {
         e.preventDefault();
-        console.log('event params BEFORE clear', trackingClient.getEventParams());
+        var formData = new FormData(e.target);
+        var submittedFormValues = Object.fromEntries(formData.entries());
 
-        // Test clearing potentially persisted lead fields.
-        trackingClient.setEventParam('name', '');
-        trackingClient.setEventParam('email', '');
-        trackingClient.setEventParam('phone', '');
+        if (DEBUG_EVENT_PAYLOAD) {
+          console.group('DEBUG Submitted form values');
+          console.log(submittedFormValues);
+          console.groupEnd();
+        }
 
         // Fire conversion event (Event Type ID: 2)
         var conversionParams = pickDefined(Object.assign({}, trackingParams, {
           form_id: 'lead-form',
           event_name: 'form_submitted'
         }));
-        console.log('event params AFTER clear', trackingClient.getEventParams());
-        console.log('conversionParams SENT', conversionParams);
 
         trackingClient.createEvent(2, conversionParams);
       });
